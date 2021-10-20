@@ -7,9 +7,11 @@ cloudinary.config({
 });
 
 export const cloudinaryUpload = async (req, res, next) => {
-	console.log(`req.files =>`, req.files);
-	const fileKeys = Object.keys(req.files);
+	console.log(`req.filesMid =>`, req.files.picture);
+	const fileKeys = Object.keys(req.files.picture);
+	console.log(`fileKeys.length =>`, fileKeys.length);
 	let results = {};
+	const arrayOfUrl = [];
 
 	if (fileKeys.length === 0) {
 		res.send('No file uploaded!');
@@ -17,19 +19,39 @@ export const cloudinaryUpload = async (req, res, next) => {
 	}
 	fileKeys.forEach(async (fileKey) => {
 		try {
-			const file = req.files[fileKey];
-			const result = await cloudinary.uploader.upload(file.path);
+			const file = req.files.picture[fileKey];
+			const result = await cloudinary.uploader.upload(file.tempFilePath);
+			// console.log(`result =>`, result);
 			results[fileKey] = {
 				success: true,
 				result: result,
 			};
+			arrayOfUrl.push(result.url);
 
 			if (Object.keys(results).length === fileKeys.length) {
 				// tous les uploads sont terminés, on peut donc envoyer la réponse au client
+				console.log(`arrayOfUrl =>`, arrayOfUrl);
+				req.body.url = arrayOfUrl;
 				next();
 			}
 		} catch (error) {
 			console.log(error);
 		}
 	});
+};
+
+export const cloudinaryUploadSingle = async (req, res, next) => {
+	console.log(`req.files.picture =>`, req.files.picture);
+	cloudinary.uploader.upload(
+		req.files.picture.tempFilePath,
+		(result, error) => {
+			if (error) {
+				console.log(`error =>`, error);
+			}
+			console.log(`result =>`, result);
+			req.body.url = result.url;
+		}
+	);
+
+	next();
 };

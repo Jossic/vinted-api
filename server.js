@@ -25,8 +25,8 @@ app.use(
 	})
 );
 // for parsing multipart/form-data
-app.use(upload.any());
-app.use(express.static('public'));
+// app.use(upload.any());
+// app.use(express.static('public'));
 
 app.use(express.json());
 

@@ -34,7 +34,7 @@ export const signup = async (req, res) => {
 	//     "password": "azerty"
 	//   }
 
-	const { username, email, password, phone } = req.body;
+	const { username, email, password, phone, url } = req.body;
 	try {
 		const userExists = await User.findOne({ email });
 
@@ -54,8 +54,7 @@ export const signup = async (req, res) => {
 		'account.username': username,
 		'account.phone': phone,
 	});
-	// user.account.username = username;
-	// user.account.phone = phone;
+	user.account.avatar.secure_url = url;
 
 	if (user) {
 		res.status(201).json({
