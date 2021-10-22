@@ -46,13 +46,54 @@ export const publishProduct = async (req, res) => {
 // @route   POST /offer/offers
 // @access  Private
 export const getOffers = async (req, res) => {
-	console.log(`req.query =>`, req.query);
+	// console.log(`req.query =>`, req.query);
+	let { title, priceMin, priceMax } = req.query;
 	try {
-		const offers = await Offer.find({
-			product_name: new RegExp(req.query.title, 'i'),
-		}).select('product_name product_price');
+		const filters = {};
 
-		res.json(offers);
+		if (title) {
+			filters.product_name = new RegExp(title, 'i');
+		}
+
+		if (priceMin) {
+			filters.product_price = { $gte: priceMin };
+		}
+
+		if (priceMax) {
+			if (filters.product_price) {
+				filters.product_price.$lte = priceMax;
+			} else {
+				filters.product_price = {
+					$lte: priceMax,
+				};
+			}
+		}
+
+		//console.log(filters);
+		let sort = {};
+		req.query.sort === 'price-desc'
+			? (sort = { product_price: -1 })
+			: (sort = { product_price: 1 });
+
+		// Par défaut on envoie la page 1
+		let page = 1;
+		req.query.page && (page = Number(req.query.page));
+		// Par défaut on fixe la limite à 3
+		let limit = 3;
+		req.query.limit && (limit = Number(req.query.limit));
+
+		const offers = await Offer.find(filters)
+			.sort(sort)
+			.skip((page - 1) * limit)
+			.limit(limit)
+			.select('product_name product_price');
+
+		const count = await Offer.countDocuments(filters);
+
+		res.json({
+			count: count,
+			offers: offers,
+		});
 	} catch (error) {
 		res.status(400).json({ message: error.message });
 	}

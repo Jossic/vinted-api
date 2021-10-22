@@ -7,8 +7,8 @@ cloudinary.config({
 });
 
 export const cloudinaryUpload = async (req, res, next) => {
-	console.log(`req.filesMid =>`, req.files.picture);
-	const fileKeys = Object.keys(req.files.picture);
+	console.log(`req.files =>`, req.files);
+	const fileKeys = Object.keys(req.files);
 	console.log(`fileKeys.length =>`, fileKeys.length);
 	let results = {};
 	const arrayOfUrl = [];
@@ -16,40 +16,36 @@ export const cloudinaryUpload = async (req, res, next) => {
 	if (fileKeys.length === 0) {
 		res.send('No file uploaded!');
 		return;
-	}
-	fileKeys.forEach(async (fileKey) => {
-		try {
-			const file = req.files.picture[fileKey];
-			const result = await cloudinary.uploader.upload(file.tempFilePath);
-			// console.log(`result =>`, result);
-			results[fileKey] = {
-				success: true,
-				result: result,
-			};
-			arrayOfUrl.push(result.url);
-
-			if (Object.keys(results).length === fileKeys.length) {
-				// tous les uploads sont terminés, on peut donc envoyer la réponse au client
-				console.log(`arrayOfUrl =>`, arrayOfUrl);
-				req.fields.url = arrayOfUrl;
-				next();
+	} else if (fileKeys.length === 1) {
+		cloudinary.uploader.upload(req.files.picture.path, (result, error) => {
+			if (error) {
+				console.log(`error =>`, error);
 			}
-		} catch (error) {
-			console.log(error);
-		}
-	});
-};
+			// console.log(`result =>`, result);
+			req.fields.url = result.url;
+			next();
+		});
+	} else {
+		fileKeys.forEach(async (fileKey) => {
+			try {
+				const file = req.files.picture[fileKey];
+				const result = await cloudinary.uploader.upload(file.path);
+				// console.log(`result =>`, result);
+				results[fileKey] = {
+					success: true,
+					result: result,
+				};
+				arrayOfUrl.push(result.url);
 
-export const cloudinaryUploadSingle = async (req, res, next) => {
-	// console.log(`req.files.picture =>`, req.files.picture);
-	console.log(`req.files =>`, req.files.picture);
-
-	cloudinary.uploader.upload(req.files.picture, (result, error) => {
-		if (error) {
-			console.log(`error =>`, error);
-		}
-		console.log(`result =>`, result);
-		req.fields.url = result.url;
-		next();
-	});
+				if (Object.keys(results).length === fileKeys.length) {
+					// tous les uploads sont terminés, on peut donc envoyer la réponse au client
+					// console.log(`arrayOfUrl =>`, arrayOfUrl);
+					req.fields.url = arrayOfUrl;
+					next();
+				}
+			} catch (error) {
+				console.log(error);
+			}
+		});
+	}
 };

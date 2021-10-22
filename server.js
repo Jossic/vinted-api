@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import offerRoutes from './routes/offerRoutes.js';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -16,7 +17,8 @@ connectDB();
 mongoose.connection;
 
 const app = express();
-app.use(formidableMiddleware());
+app.use(formidableMiddleware({ multiples: true }));
+app.use(cors());
 
 // app.use(fileUpload({ useTempFiles: true }));
 // app.use(
