@@ -33,7 +33,7 @@ export const signup = async (req, res) => {
 	//     "phone": "0606060606",
 	//     "password": "azerty"
 	//   }
-
+	console.log(`req.body =>`, req.body);
 	const { username, email, password, phone, url } = req.body;
 	try {
 		const userExists = await User.findOne({ email });
@@ -53,8 +53,8 @@ export const signup = async (req, res) => {
 		password,
 		'account.username': username,
 		'account.phone': phone,
+		'account.avatar.secure_url': url,
 	});
-	user.account.avatar.secure_url = url;
 
 	if (user) {
 		res.status(201).json({

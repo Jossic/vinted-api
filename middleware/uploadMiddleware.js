@@ -41,7 +41,8 @@ export const cloudinaryUpload = async (req, res, next) => {
 };
 
 export const cloudinaryUploadSingle = async (req, res, next) => {
-	console.log(`req.files.picture =>`, req.files.picture);
+	// console.log(`req.files.picture =>`, req.files.picture);
+	console.log(`req.params =>`, req.authorization);
 	cloudinary.uploader.upload(
 		req.files.picture.tempFilePath,
 		(result, error) => {
@@ -50,8 +51,7 @@ export const cloudinaryUploadSingle = async (req, res, next) => {
 			}
 			console.log(`result =>`, result);
 			req.body.url = result.url;
+			next();
 		}
 	);
-
-	next();
 };

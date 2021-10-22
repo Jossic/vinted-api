@@ -41,3 +41,19 @@ export const publishProduct = async (req, res) => {
 		}
 	});
 };
+
+// @desc    Publish product
+// @route   POST /offer/offers
+// @access  Private
+export const getOffers = async (req, res) => {
+	console.log(`req.query =>`, req.query);
+	try {
+		const offers = await Offer.find({
+			product_name: new RegExp(req.query.title, 'i'),
+		}).select('product_name product_price');
+
+		res.json(offers);
+	} catch (error) {
+		res.status(400).json({ message: error.message });
+	}
+};
