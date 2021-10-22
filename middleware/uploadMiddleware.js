@@ -31,7 +31,7 @@ export const cloudinaryUpload = async (req, res, next) => {
 			if (Object.keys(results).length === fileKeys.length) {
 				// tous les uploads sont terminés, on peut donc envoyer la réponse au client
 				console.log(`arrayOfUrl =>`, arrayOfUrl);
-				req.body.url = arrayOfUrl;
+				req.fields.url = arrayOfUrl;
 				next();
 			}
 		} catch (error) {
@@ -41,17 +41,14 @@ export const cloudinaryUpload = async (req, res, next) => {
 };
 
 export const cloudinaryUploadSingle = async (req, res, next) => {
-	// console.log(`req.files.picture =>`, req.files.picture);
-	console.log(`req.params =>`, req.authorization);
-	cloudinary.uploader.upload(
-		req.files.picture.tempFilePath,
-		(result, error) => {
-			if (error) {
-				console.log(`error =>`, error);
-			}
-			console.log(`result =>`, result);
-			req.body.url = result.url;
-			next();
+	console.log(`req.files =>`, req.files);
+	console.log(`req.fields =>`, req.fields);
+	cloudinary.uploader.upload(req.files, (result, error) => {
+		if (error) {
+			console.log(`error =>`, error);
 		}
-	);
+		console.log(`result =>`, result);
+		req.fields.url = result.url;
+		next();
+	});
 };

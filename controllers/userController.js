@@ -8,7 +8,7 @@ dotenv.config();
 // @route   POST /user/login
 // @access  Public
 export const login = async (req, res) => {
-	const { email, password } = req.body;
+	const { email, password } = req.fields;
 
 	const user = await User.findOne({ email });
 
@@ -33,8 +33,8 @@ export const signup = async (req, res) => {
 	//     "phone": "0606060606",
 	//     "password": "azerty"
 	//   }
-	console.log(`req.body =>`, req.body);
-	const { username, email, password, phone, url } = req.body;
+	console.log(`req.fields =>`, req.fields);
+	const { username, email, password, phone, url } = req.fields;
 	try {
 		const userExists = await User.findOne({ email });
 
