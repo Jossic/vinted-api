@@ -14,7 +14,7 @@ export const publishProduct = async (req, res) => {
 		size,
 		color,
 		url,
-	} = req.fields;
+	} = req.body;
 
 	const offer = await new Offer({
 		product_name: title,

@@ -2,7 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import colors from 'colors';
 import dotenv from 'dotenv';
-import formidableMiddleware from 'express-formidable';
+import fileUpload from 'express-fileupload';
 import mongoose from 'mongoose';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
@@ -15,14 +15,14 @@ connectDB();
 mongoose.connection;
 
 const app = express();
-app.use(formidableMiddleware());
-// app.use(fileUpload({ useTempFiles: true }));
-// app.use(
-// 	express.urlencoded({
-// 		extended: true,
-// 	})
-// );
-// app.use(express.json());
+// app.use(formidableMiddleware());
+app.use(fileUpload({ useTempFiles: true }));
+app.use(
+	express.urlencoded({
+		extended: true,
+	})
+);
+app.use(express.json());
 
 app.use('/user', userRoutes);
 app.use('/offer', offerRoutes);
